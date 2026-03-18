@@ -1,4 +1,4 @@
-# GroupsApp
+# GroupsApp - backend
 Design, implement, and deploy on AWS an instant messaging application called GroupsApp, similar to WhatsApp or Telegram, with a distributed architecture that is highly scalable and fault-tolerant.
 
 ## Arquitectura
