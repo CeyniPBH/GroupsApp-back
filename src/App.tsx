@@ -1,38 +1,32 @@
 import './App.css'
 import Chat from './components/home/chat/chatDisplay/chat';
 import { useState } from 'react';
-import PopUp from './components/popUp/PopUP';
+import ContactList from './components/contactList/contactList';
+
 function App() {
-   
-   const [contactos, setContactos] = useState<string[]>(['samuel', 'maria']);
-   const [usuariosDisponibles, setUsuariosDisponibles] = useState<string[]>([
-    'juan', 'pedro', 'lucia', 'carlos','sofia'
-  ]);
   const [usuarioActual, setUsuarioActual] = useState('samuel');
-  const [popUpAbierto, setPopUpAbierto] = useState(false);
-  const agregarContacto = (usuario: string) => {
-    setContactos([...contactos, usuario]);
-    setUsuariosDisponibles(usuariosDisponibles.filter(u => u !== usuario));
-    setPopUpAbierto(false);
-  };
-  const eliminarContacto = (usuario: string) => {
-    setContactos(contactos.filter(c => c !== usuario));
-    setUsuariosDisponibles([...usuariosDisponibles, usuario]);
-    
-    if (usuarioActual === usuario) {
-      const nuevoContacto = contactos.filter(c => c !== usuario)[0];
-      setUsuarioActual(nuevoContacto || '');
-    }
-  };
   const handleSendMessage = (message: string) => {
     //aqui deberias conectar con db
   };
-  const cerrarPopUp = () => {
-    setPopUpAbierto(false);
-  };
   return (
       <div id="app" className="flex h-screen w-full">
-          <section id="user" className='h-full w-2/5 flex-row flex'>
+              <ContactList
+        usuarioActual={usuarioActual}
+        onSelectContacto={setUsuarioActual}
+      />
+          <section id="chat" className=' h-full w-3/5 bg-emerald-300 flex flex-col'>
+            <Chat key={usuarioActual} userId={usuarioActual} />
+            
+          </section>
+          
+      </div>
+  )
+}
+export default App
+
+
+/*
+<section id="user" className='h-full w-2/5 flex-row flex'>
             <div className='h-full w-2/12 bg-blue-300'>
             <button
           onClick={() => setPopUpAbierto(true)}
@@ -65,18 +59,6 @@ function App() {
           </div>))}
       </div>
           </section>
-          <section id="chat" className=' h-full w-3/5 bg-emerald-300 flex flex-col'>
-            <Chat key={usuarioActual} userId={usuarioActual} />
-            
-          </section>
-          {popUpAbierto && (
-        <PopUp 
-        usuariosDisponibles={usuariosDisponibles}
-          onAgregar={agregarContacto}
-          onCerrar={cerrarPopUp}
-          />
-          )}
-      </div>
-  )
-}
-export default App
+
+
+*/
