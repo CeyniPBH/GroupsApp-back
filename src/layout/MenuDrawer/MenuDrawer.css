@@ -1,0 +1,171 @@
+/* Botón flotante */
+.md-trigger-button { 
+  color: darkblue;  
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 10px;
+  display: flex;
+}
+
+.md-trigger-button:hover {
+  transform: scale(1.1);
+}
+
+.md-trigger-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Drawer */
+.md-drawer {
+  position: fixed;
+  right: 0;
+  width: 90%;
+  max-width: 380px;
+  background: var(--accent);
+  color: white;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+}
+.md-drawer {
+  position: fixed;
+  top: 80px; /* por defecto debajo del navbar */
+  right: 0;
+  height: calc(100vh - 80px);
+  width: 90%;
+  max-width: 380px;
+  background: var(--accent);
+  color: white;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+}
+
+/* Cuando el navbar está oculto, el drawer ocupa toda la pantalla */
+.md-drawer.full {
+  height: 100vh;
+}
+
+/* Close button */
+.md-close-wrapper {
+  padding: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.md-close-button {
+  transition: background 0.2s ease;
+  padding: 10px;
+}
+
+.md-close-button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.md-close-icon {
+  width: 24px;
+  height: 24px;
+} 
+
+/* Nav */
+.md-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 24px 40px 24px;
+}
+
+.md-menu-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+}
+
+.md-menu-item {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 8px;
+}
+
+.md-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.md-menu-link {
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  color: var(--bg-light);
+}
+
+.md-menu-link:hover {
+  color: white;
+}
+
+.md-chevron {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  opacity: 0.6;
+}
+
+.md-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Submenu */
+.md-submenu {
+  overflow: hidden;
+  padding-left: 16px;
+  border-left: 2px solid rgba(255,255,255,0.1);
+  margin-left: 8px;
+}
+
+.md-submenu-link {
+  display: block;
+  padding: 8px 0;
+  font-size: 0.875rem;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.md-submenu-link:hover {
+  color: white;
+  transform: translateX(4px);
+}
+
+/* Footer */
+.md-footer {
+  padding: 16px 32px; 
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
+  flex-shrink: 0; 
+}
+
+.md-follow-text {
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.md-social {
+  display: flex;
+  gap: 16px;
+}
+
+.md-social a {
+  transition: transform 0.2s ease, color 0.2s ease;
+  color: var(--bg-light);
+}
+
+.md-social a:hover {
+  transform: scale(1.1);
+  color: #f59e0b; /* color hover específico del drawer, no en global */
+}

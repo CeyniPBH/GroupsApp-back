@@ -1,0 +1,50 @@
+/* Fondo general */
+.ob-container {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(243, 244, 246, 0.3); /* equivalente bg-secondary/30 */
+}
+
+/* Blob base */
+.ob-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+  filter: blur(60px);
+  opacity: 0.4;
+}
+
+/* Tamaños */
+.ob-lg {
+  width: 384px;
+  height: 384px;
+}
+
+.ob-xl {
+  width: 500px;
+  height: 500px;
+}
+
+.ob-md {
+  width: 320px;
+  height: 320px;
+}
+
+/* Posiciones */
+.ob-top-left {
+  top: -80px;
+  left: -80px;
+}
+
+.ob-bottom-right {
+  bottom: -128px;
+  right: -128px;
+}
+
+.ob-center {
+  top: 50%;
+  left: 33%;
+}
