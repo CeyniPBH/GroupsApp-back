@@ -31,7 +31,7 @@ const Navbar = ({userName}:navbarProps) => {
   }, []);
 
     return (
-      <nav className="navbar w-full h-20 bg-emerald-800 flex flex-column" style={{ transform: `translateY(-${scrollOffset}px)` }}>
+      <nav className="navbar w-full h-20 bg-slate-900 flex flex-column" style={{ transform: `translateY(-${scrollOffset}px)` }}>
           <div className='h-20 w-20 flex items-center justify-center'>
             <img src={fotoPerfil} className="w-12 h-12 rounded-4xl" onError={(e) => {
             // Si la imagen no existe, usar la foto por defecto

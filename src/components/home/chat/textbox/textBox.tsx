@@ -39,7 +39,7 @@ const TextBox = ({ onSendMessage }: TextBoxProps) => {
         />
         <button
           type="submit"
-          className=" h-14 text-white rounded-xl focus:outline-none outline-0"
+          className=" h-14 text-white rounded-xl text-lg hover:inset-shadow-zinc-900 inset-shadow-xs hover:text-[17px]  "
         >
           Enviar
         </button>

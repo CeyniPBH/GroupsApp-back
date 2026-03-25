@@ -1,54 +1,37 @@
-// ContactList.tsx (maneja TODO lo de contactos)
-import { useState } from 'react';
 import PopUp from '../popUp/PopUP';
-
-interface ContactListProps {
-  usuarioActual: string;
-  onSelectContacto: (contacto: string) => void;
-}
-
+import type {ContactListProps }from './contactList.types';
+import { useContactList } from './contactList.logic';
+import AddUserIcon from '../../assets/addUser.svg';
 const ContactList = ({ usuarioActual, onSelectContacto }: ContactListProps) => {
-  // Estados que antes estaban en App
-  const [contactos, setContactos] = useState<string[]>(['samuel', 'maria']);
-  const [usuariosDisponibles, setUsuariosDisponibles] = useState<string[]>([
-    'juan', 'pedro', 'lucia', 'carlos', 'sofia'
-  ]);
-  const [popUpAbierto, setPopUpAbierto] = useState(false);
 
-  const agregarContacto = (usuario: string) => {
-    setContactos([...contactos, usuario]);
-    setUsuariosDisponibles(usuariosDisponibles.filter(u => u !== usuario));
-    setPopUpAbierto(false);
-  };
-
-  const eliminarContacto = (usuario: string) => {
-    setContactos(contactos.filter(c => c !== usuario));
-    setUsuariosDisponibles([...usuariosDisponibles, usuario]);
-    
-    if (usuarioActual === usuario) {
-      const nuevoContacto = contactos.filter(c => c !== usuario)[0];
-      onSelectContacto(nuevoContacto || '');
-    }
-  };
+  const {
+    contactos,
+    usuariosDisponibles,
+    popUpAbierto,
+    setPopUpAbierto,
+    agregarContacto,
+    eliminarContacto
+  } = useContactList(usuarioActual, onSelectContacto);
 
   return (
     <section id="user" className='h-full w-2/5 flex-row flex'>
-      <div className='h-full w-2/12 bg-blue-300'>
+      <div className='h-full w-2/12 bg-slate-950 flex flex-col justify-end'>
         <button
           onClick={() => setPopUpAbierto(true)}
-          className="mt-4 p-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="mt-4 p-2  text-white rounded flex justify-center hover:text-gray-200 "
         >
-          + Agregar usuario
+          <AddUserIcon className="w-10 h-10" />
         </button>
       </div>
       
-      <div className='h-full w-10/12 bg-blue-700'>
-        <h3 className="font-bold mb-2 ml-3">CONTACTOS</h3>
-        {contactos.map(contacto => (
-          <div key={contacto} className='justify-between items-center flex w-full p-2'>
+      <div className='h-full w-10/12 border-r-4 border-r-slate-950/30  bg-slate-900'>
+        <h3 className="font-bold h-19 text-2xl  content-center ml-5">CONTACTOS</h3>
+        <div id="line"className='border-t-4 border-t-slate-950/30 pb-4'></div>
+          {contactos.map(contacto => (
+          <div key={contacto} className=' text-xl justify-between  rounded-xl flex mb-2 mx-4 w-[13/14] bg-slate-800  hover:bg-slate-700'>
             <button
               onClick={() => onSelectContacto(contacto)}
-              className={`ml-2 p-2 w-10/12 ${
+              className={`w-10/12 ${
                 usuarioActual === contacto ? 'font-bold text-white' : ''
               }`}
             >
@@ -56,13 +39,14 @@ const ContactList = ({ usuarioActual, onSelectContacto }: ContactListProps) => {
             </button>
             <button
               onClick={() => eliminarContacto(contacto)}
-              className="w-2/12 p-2 text-red-500 hover:text-red-700 hover:bg-red-100"
+              className="w-2/12 p-2 text-slate-800 hover:text-red-500"
             >
-              X
+              x
             </button>
           </div>
         ))}
-      </div>
+        </div>
+      
 
       {popUpAbierto && (
         <PopUp

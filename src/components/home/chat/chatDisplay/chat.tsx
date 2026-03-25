@@ -18,7 +18,7 @@ const Chat = ({ userId }: ChatProps) => {
         <section id="messages" className='flex-1'>
               <MessagesList messages={messages} />
         </section>
-            <div id="textbox" className='h-14 w-11/12 bg-black mx-auto mb-2 mt-2 rounded-xl'>
+            <div id="textbox" className='h-14 w-11/12 bg-slate-950 mx-auto mb-2 mt-2 rounded-xl'>
             <TextBox onSendMessage={handleSendMessage}/>
             </div>
   </div>);
