@@ -11,51 +11,46 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
       return;
     }
-    
+
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
-    
+
     setLoading(true);
-    
     try {
-      // Llamar al backend para registrar
       await apiFetch('POST', '/auth/register', {
         name: username,
         email,
         password
       });
-      
-      // Redirigir al login después de registro exitoso
       navigate('/login');
-      
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
-    };
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-700">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">Registrarse</h2>
-        
+
         {error && (
           <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Nombre de usuario</label>
@@ -69,7 +64,7 @@ const Register = () => {
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Email</label>
             <input
@@ -82,7 +77,7 @@ const Register = () => {
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Contraseña</label>
             <input
@@ -95,7 +90,7 @@ const Register = () => {
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-6">
             <label className="block text-gray-700 mb-2">Confirmar contraseña</label>
             <input
@@ -108,7 +103,7 @@ const Register = () => {
               disabled={loading}
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={loading}
@@ -117,10 +112,10 @@ const Register = () => {
             {loading ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>
-        
+
         <p className="mt-4 text-center text-gray-600">
           ¿Ya tienes cuenta?{' '}
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="text-blue-800 hover:underline shadow-blue-900"
             disabled={loading}

@@ -1,7 +1,14 @@
 // PopUp.tsx
+interface User {
+  id: number;
+  name: string;
+  tag: string;
+  status: string;
+}
+
 interface PopUpProps {
-  usuariosDisponibles: string[];
-  onAgregar: (usuario: string) => void;
+  usuariosDisponibles: User[];
+  onAgregar: (usuario: User) => void;
   onCerrar: () => void;
 }
 
@@ -26,11 +33,11 @@ const PopUp = ({ usuariosDisponibles, onAgregar, onCerrar }: PopUpProps) => {
             </p>
           ) : (
             usuariosDisponibles.map(usuario => (
-              <div 
-                key={usuario}
+              <div
+                key={usuario.id}
                 className="flex justify-between items-center bg-slate-200 p-3 mb-3 rounded-xl text-gray-700"
               >
-                <span className="font-medium">{usuario}</span>
+                <span className="font-medium">{usuario.name}#{usuario.tag}</span>
                 <button
                   onClick={() => onAgregar(usuario)}
                   className="px-3 py-1 bg-blue-500 text-gray-100 rounded hover:bg-blue-600"

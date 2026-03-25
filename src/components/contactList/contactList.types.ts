@@ -1,4 +1,11 @@
+export interface User {
+  id: number;
+  name: string;
+  tag: string;
+  status: string;
+}
+
 export interface ContactListProps {
-  usuarioActual: string;
-  onSelectContacto: (contacto: string) => void;
+  usuarioActual: User | null;
+  onSelectContacto: (contacto: User) => void;
 }

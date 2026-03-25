@@ -1,27 +1,30 @@
 import { useState, useEffect } from 'react';
-import ContactList from '../components/contactList/contactList'; 
-import Chat from '../components/home/chat/chatDisplay/chat'; 
+import { useNavigate } from 'react-router-dom';
+import ContactList from '../components/contactList/contactList';
+import Chat from '../components/home/chat/chatDisplay/chat';
+import { connectSocket, disconnectSocket } from '../services/socket';
+import type { User } from '../components/contactList/contactList.types';
 
 const HomePage = () => {
-  const [usuarioActual, setUsuarioActual] = useState('samuel');
+  const navigate = useNavigate();
+  const [usuarioActual, setUsuarioActual] = useState<User | null>(null);
 
-  const handleSendMessage = (message: string) => {
-    // aquí deberías conectar con db
-    console.log('Mensaje enviado:', message);
-  };
-
-  // Verificar autenticación al cargar
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      // Redirigir a login si no hay token
-      window.location.href = '/login';
+      navigate('/login');
+      return;
     }
+    connectSocket(token);
+    return () => {
+      disconnectSocket();
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   return (
@@ -32,14 +35,14 @@ const HomePage = () => {
       />
       <section id="chat" className='h-full w-3/5 bg-gray-800 flex flex-col'>
         <div className="flex justify-end p-2">
-          <button 
+          <button
             onClick={handleLogout}
             className="bg-red-500 text-white px-3 py-1 rounded text-sm"
           >
             Cerrar sesión
           </button>
         </div>
-        <Chat key={usuarioActual} userId={usuarioActual} />
+        {usuarioActual && <Chat key={usuarioActual.id} userId={usuarioActual.id} />}
       </section>
     </div>
   );
