@@ -1,11 +1,40 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:3000';
+const SOCKET_URL = import.meta.env.VITE_API_URL;
 
-const socket: Socket = io(SOCKET_URL, {
-  autoConnect: false, // Conectar manualmente
-});
+let socket: Socket | null = null;
 
+export const connectSocket = (token: string) => {
+  if (socket?.connected) {
+    console.log('Socket ya conectado');
+    return socket;
+  }
+
+  socket = io(SOCKET_URL, {
+    auth: { token },
+    transports: ['websocket', 'polling'],
+    autoConnect: true,
+  });
+  socket.on('connect', () => {
+    console.log('✅ Socket conectado correctamente');
+  });
+  socket.on('connect_error', (error) => {
+    console.error('❌ Error de conexión socket:', error);
+  });
+  socket.on('disconnect', () => {
+    console.log('🔌 Socket desconectado');
+  });
+  return socket;
+};
+export const disconnectSocket = () => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+    console.log('🔌 Socket desconectado manualmente');
+  }
+};
+
+export const getSocket = () => socket;
 export default socket;
 
 // Eventos de Socket.IO
@@ -15,14 +44,4 @@ export const socketEvents = {
   newMessage: 'newMessage',
   userJoined: 'userJoined',
   userLeft: 'userLeft',
-};
-
-// Funciones para manejar conexiones
-export const connectSocket = (token: string) => {
-  socket.auth = { token };
-  socket.connect();
-};
-
-export const disconnectSocket = () => {
-  socket.disconnect();
 };

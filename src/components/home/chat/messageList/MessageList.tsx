@@ -1,14 +1,16 @@
 import Message from "../message/Message";
+import type { MessageItem } from "../message/Message";
 
-interface MessagesListProps {
-  messages: string[];
+interface MessageProps {
+  messages: MessageItem[];
 }
 
-const MessagesList = ({ messages }: MessagesListProps) => {
+
+const MessagesList = ({ messages }: MessageProps) => {
   return (
     <div className="flex flex-col p-4">
-      {messages.map((msg, index) => (
-        <Message key={index} text={msg} />
+      {messages.map(msg => (
+        <Message key={msg.id} {...msg} />
       ))}
     </div>
   );

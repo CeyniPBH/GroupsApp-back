@@ -21,22 +21,24 @@ const Login = () => {
     }
     
     try {
-      // Llamar al backend
-      const data = await apiFetch('POST', '/auth/login', {
-        email,
-        password
-      });
-      
-      // Guardar token y usuario en localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Redirigir al home
-      navigate('/');
-      
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+  const data = await apiFetch('POST', '/auth/login', {
+    email,
+    password
+  });
+  
+  // Guardar token y usuario en localStorage
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('user', JSON.stringify(data.user));
+  console.log('✅ Token guardado:', data.token);
+  
+  // Redirigir al home
+  window.location.href = '/';
+  
+} catch (err: any) {
+  console.log('❌ Error capturado:', err);
+  console.log('❌ Mensaje de error:', err.message);
+  setError(err.message);
+}finally {
       setLoading(false);
     }
   };

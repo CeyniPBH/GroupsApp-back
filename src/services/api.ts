@@ -1,9 +1,9 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:3000';
-
+const API_URL = import.meta.env.VITE_API_URL || 'http://34.226.227.26:3000';
 // ── fetch nativo (usado por Login/Register) ──────────────────────────────────
 export async function apiFetch(method: string, endpoint: string, body?: any) {
+  const url = `${API_URL}${endpoint}`;
+  
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -44,19 +44,23 @@ api.interceptors.request.use((config: any) => {
 export default api;
 
 export const usersAPI = {
-  search: (query: string) => api.get(`/users/search?q=${query}`),
+  search: (query: string) => api.get(`/users/search/name?q=${encodeURIComponent(query)}`),
   getProfile: () => api.get('/users/profile'),
 };
 
 export const contactsAPI = {
   getContacts: () => api.get('/contacts'),
-  addContact: (userId: number) => api.post('/contacts', { userId }),
+  addContact: (userId: number) => api.post('/contacts', { contactId: userId }), // nota: contactId, no userId
   removeContact: (contactId: number) => api.delete(`/contacts/${contactId}`),
+  
+  getPendingRequests: () => api.get('/contacts?status=pending'),
+  acceptRequest: (contactId: number) => api.put(`/contacts/${contactId}/accept`, {}),
+  rejectRequest: (contactId: number) => api.put(`/contacts/${contactId}/block`, {}),
 };
 
 export const chatsAPI = {
   getChats: () => api.get('/chats'),
-  createChat: (data: { name?: string; isGroup: boolean; memberIds: number[] }) =>
+  createChat: (data: { type: string; participantIds: number[]; name?: string }) =>
     api.post('/chats', data),
   getMessages: (chatId: number) => api.get(`/messages/${chatId}`),
   sendMessage: (chatId: number, content: string, type: string = 'text') =>

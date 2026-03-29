@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { contactsAPI, usersAPI } from '../../services/api';
-import type { User } from './contactList.types';
+import type { User, PendingRequest } from './contactList.types';
 
 export const useContactList = (
   usuarioActual: User | null,
@@ -9,45 +9,172 @@ export const useContactList = (
   const [contactos, setContactos] = useState<User[]>([]);
   const [usuariosDisponibles, setUsuariosDisponibles] = useState<User[]>([]);
   const [popUpAbierto, setPopUpAbierto] = useState(false);
+  
+  const [solicitudesPendientes, setSolicitudesPendientes] = useState<PendingRequest[]>([]);
+  const [popUpSolicitudesAbierto, setPopUpSolicitudesAbierto] = useState(false);
+  const [notificaciones, setNotificaciones] = useState(0);
 
+  // Cargar contactos aceptados
   useEffect(() => {
-    contactsAPI.getContacts().then((res: any) => {
-      setContactos(res.data);
-    }).catch((err: any) => console.error('Error cargando contactos:', err));
+    if (!usuarioActual) return;
+    
+    const cargarContactos = async () => {
+      try {
+        const res = await contactsAPI.getContacts();
+        // Filtrar solo contactos aceptados (status = 'accepted')
+        const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
+        setContactos(contactosAceptados);
+      } catch (error) {
+        console.error('Error cargando contactos:', error);
+      }
+    };
+    
+    cargarContactos();
+  }, [usuarioActual]);
 
-    usersAPI.search('').then((res: any) => {
-      setUsuariosDisponibles(res.data);
-    }).catch((err: any) => console.error('Error cargando usuarios:', err));
-  }, []);
+  // Cargar solicitudes pendientes
+  useEffect(() => {
+    if (!usuarioActual) return;
+    
+    const cargarSolicitudes = async () => {
+      try {
+        const res = await contactsAPI.getPendingRequests();
+        // Filtrar solicitudes donde el usuario actual es el contactId
+        const pendientes = res.data.filter(
+          (r: any) => r.contactId === usuarioActual.id && r.status === 'pending'
+        );
+        setSolicitudesPendientes(pendientes);
+        setNotificaciones(pendientes.length);
+      } catch (error) {
+        console.error('Error cargando solicitudes:', error);
+        // Fallback: si el endpoint no funciona, probar con getContacts
+        try {
+          const allRes = await contactsAPI.getContacts();
+          const pendientes = allRes.data.filter(
+            (c: any) => c.contactId === usuarioActual.id && c.status === 'pending'
+          );
+          setSolicitudesPendientes(pendientes);
+          setNotificaciones(pendientes.length);
+        } catch (e) {
+          console.error('Error en fallback:', e);
+        }
+      }
+    };
+    
+    cargarSolicitudes();
+    
+    // Recargar cada 15 segundos (como en el HTML original)
+    const interval = setInterval(cargarSolicitudes, 15000);
+    return () => clearInterval(interval);
+  }, [usuarioActual]);
 
-  // Filtrar usuarios ya agregados
-  const disponibles = usuariosDisponibles.filter(
-    u => !contactos.some(c => c.id === u.id) && u.id !== usuarioActual?.id
-  );
+  // Cargar usuarios disponibles para agregar
+useEffect(() => {
+  if (!usuarioActual) {
+    console.log('⚠️ usuarioActual es null, esperando...');
+    return;
+  }
+  const cargarUsuarios = async () => {
+    try {
+      const res = await usersAPI.search('a');
+      
+      // La respuesta puede estar en res.data o directamente en res
+      let usuarios = Array.isArray(res.data) ? res.data : [];
+      
+      // Si la respuesta es un objeto con una propiedad 'users'
+      if (res.data && res.data.users && Array.isArray(res.data.users)) {
+        usuarios = res.data.users;
+      }
 
-  const agregarContacto = (usuario: User) => {
-    contactsAPI.addContact(usuario.id).then(() => {
-      setContactos(prev => [...prev, usuario]);
+      // Filtrar: excluir usuario actual y los que ya son contactos
+      const disponibles = usuarios.filter(
+        (u: User) => 
+          u.id !== usuarioActual?.id && 
+          !contactos.some(c => c.id === u.id)
+      );
+      
+      setUsuariosDisponibles(disponibles);
+      
+    } catch (error) {
+      console.error('❌ Error cargando usuarios:', error);
+    }
+  };
+  
+  cargarUsuarios();
+}, [contactos, usuarioActual]);
+
+  const agregarContacto = async (usuario: User) => {
+    try {
+      await contactsAPI.addContact(usuario.id);
+      // Recargar contactos
+      const res = await contactsAPI.getContacts();
+      const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
+      setContactos(contactosAceptados);
       setPopUpAbierto(false);
-    }).catch((err: any) => console.error('Error agregando contacto:', err));
+    } catch (error) {
+      console.error('Error agregando contacto:', error);
+    }
   };
 
-  const eliminarContacto = (usuario: User) => {
-    contactsAPI.removeContact(usuario.id).then(() => {
+  const eliminarContacto = async (usuario: User) => {
+    try {
+      await contactsAPI.removeContact(usuario.id);
       setContactos(prev => prev.filter(c => c.id !== usuario.id));
       if (usuarioActual?.id === usuario.id) {
         const siguiente = contactos.filter(c => c.id !== usuario.id)[0];
         onSelectContacto(siguiente || null!);
       }
-    }).catch((err: any) => console.error('Error eliminando contacto:', err));
+    } catch (error) {
+      console.error('Error eliminando contacto:', error);
+    }
+  };
+
+  //FUNCIONES para solicitudes
+  const aceptarSolicitud = async (request: PendingRequest) => {
+    try {
+      const contactId = request.id;
+      await contactsAPI.acceptRequest(contactId);
+      
+      // Actualizar lista de solicitudes
+      setSolicitudesPendientes(prev => prev.filter(r => r.id !== contactId));
+      setNotificaciones(prev => prev - 1);
+      
+      // Recargar contactos
+      const res = await contactsAPI.getContacts();
+      const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
+      setContactos(contactosAceptados);
+      
+    } catch (error) {
+      console.error('Error aceptando solicitud:', error);
+    }
+  };
+
+  const rechazarSolicitud = async (request: PendingRequest) => {
+    try {
+      const contactId = request.id;
+      await contactsAPI.rejectRequest(contactId);
+      
+      setSolicitudesPendientes(prev => prev.filter(r => r.id !== contactId));
+      setNotificaciones(prev => prev - 1);
+      
+    } catch (error) {
+      console.error('Error rechazando solicitud:', error);
+    }
   };
 
   return {
     contactos,
-    usuariosDisponibles: disponibles,
+    usuariosDisponibles,
     popUpAbierto,
     setPopUpAbierto,
     agregarContacto,
     eliminarContacto,
+    
+    solicitudesPendientes,
+    popUpSolicitudesAbierto,
+    setPopUpSolicitudesAbierto,
+    notificaciones,
+    aceptarSolicitud,
+    rechazarSolicitud,
   };
 };

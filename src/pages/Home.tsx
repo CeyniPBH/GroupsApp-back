@@ -5,44 +5,69 @@ import Chat from '../components/home/chat/chatDisplay/chat';
 import { connectSocket, disconnectSocket } from '../services/socket';
 import type { User } from '../components/contactList/contactList.types';
 
+type Contact = {
+  id: number;
+  userId: number;
+  contactId: number;
+  status: string;
+  requester: User;
+  receiver: User;
+};
+
 const HomePage = () => {
   const navigate = useNavigate();
   const [usuarioActual, setUsuarioActual] = useState<User | null>(null);
-
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
-    connectSocket(token);
+
+    //Cargar el usuario desde localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setUsuarioActual(user);
+      } catch (error) {
+        console.error('Error parseando user:', error);
+      }
+    }
+    
+
+    if(token){connectSocket(token);}
     return () => {
       disconnectSocket();
     };
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
+  }, [navigate]);
+  const contactoReal = selectedContact
+  ? (selectedContact.requester.id === usuarioActual?.id
+      ? selectedContact.receiver
+      : selectedContact.requester)
+  : null;
   return (
     <div id="app" className="flex h-screen w-full">
       <ContactList
         usuarioActual={usuarioActual}
-        onSelectContacto={setUsuarioActual}
+        onSelectContacto={(contacto) => setSelectedContact(contacto as any)}
       />
       <section id="chat" className='h-full w-3/5 bg-gray-800 flex flex-col'>
-        <div className="flex justify-end p-2">
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-3 py-1 rounded text-sm"
-          >
-            Cerrar sesión
-          </button>
-        </div>
-        {usuarioActual && <Chat key={usuarioActual.id} userId={usuarioActual.id} />}
+        
+        {usuarioActual && selectedContact ? (
+          <Chat
+            key={selectedContact.id}
+            userId={usuarioActual.id}
+            contactId={contactoReal!.id}
+            contactName={contactoReal!.name}
+            contactTag={contactoReal!.tag}
+          />) : (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            Selecciona un contacto para empezar a chatear
+          </div>
+        )}
       </section>
     </div>
   );
