@@ -35,13 +35,15 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
       id: c.id,
       name: c.name,
       tag: c.tag,
-      type: 'contact' as const
+      type: 'contact' as const,
+      uniqueKey: `contact-${c.id}`
     })),
     ...chats.map(c => ({
       id: c.id,
       name: c.name || 'Grupo',
       tag: '',
-      type: c.type === 'group' ? 'group' as const : 'contact' as const
+      type: c.type === 'group' ? 'group' as const : 'contact' as const,
+      uniqueKey: `${c.type}-${c.id}`
     }))
   ];
 
@@ -114,7 +116,7 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
           <p className="text-gray-400 text-center py-4">No hay chats o contactos</p>
         ) : (
           items.map(item => (
-            <div key={`${item.type}-${item.id}`} className='text-xl justify-between rounded-xl flex mb-2 mx-4 w-[13/14] bg-slate-800 hover:bg-slate-700'>
+            <div key={item.uniqueKey} className='text-xl justify-between rounded-xl flex mb-2 mx-4 w-[13/14] bg-slate-800 hover:bg-slate-700'>
               <button
                 onClick={() => {
                   console.log('🖱️ Click en item:', item);
