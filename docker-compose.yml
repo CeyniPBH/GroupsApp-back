@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        - VITE_API_URL=http://34.226.227.26:3000 # Aquí inyectamos la IP de tu Backend
+    container_name: groupsapp-frontend
+    ports:
+      - "80:80"
+    restart: always
