@@ -56,11 +56,21 @@ export const useContactList = (
     
     const cargarContactos = async () => {
       try {
-        const res = await contactsAPI.getContacts();
-        // Filtrar solo contactos aceptados (status = 'accepted')
-        const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
-        setContactos(contactosAceptados);
-      } catch (error) {
+    const res = await contactsAPI.getContacts();
+    const contactosAceptados = res.data
+      .filter((c: any) => c.status === 'accepted')
+      .map((c: any) => {
+        // El contacto es el otro usuario (no yo)
+        const otroUsuario = c.userId === usuarioActual?.id ? c.receiver : c.requester;
+        return {
+          id: otroUsuario.id,
+          name: otroUsuario.name,
+          tag: otroUsuario.tag,
+          status: c.status,
+        };
+      });
+    setContactos(contactosAceptados);
+  } catch (error) {
         console.error('Error cargando contactos:', error);
       }
     };
@@ -99,8 +109,8 @@ export const useContactList = (
     
     cargarSolicitudes();
     
-    // Recargar cada 15 segundos (como en el HTML original)
-    const interval = setInterval(cargarSolicitudes, 15000);
+    // Recargar cada 5 segundos
+    const interval = setInterval(cargarSolicitudes, 5000);
     return () => clearInterval(interval);
   }, [usuarioActual]);
 

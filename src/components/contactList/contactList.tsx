@@ -1,10 +1,12 @@
 import PopUp from '../popUp/PopUP';
 import SolicitudesPopUp from '../solicitudes/SolicitudesPopUp';
 import type { ContactListProps } from './contactList.types';
+import CreateGroupPopup from '../popUp/CreateGroupPopup'; 
 import { useContactList } from './contactList.logic';
 import AddUserIcon from '../../assets/addUser.svg';
-import LogOutIcon from '../../assets/logout.svg';
+import LogOutIcon from '../../assets/logOut.svg';
 import BellIcon from '../../assets/bell.svg';
+import { useState } from 'react';
 
 const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
   const {
@@ -23,7 +25,7 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
     crearGrupo,
     chats,
   } = useContactList(usuarioActual, onSelectItem);
-
+  const [popupGrupoAbierto, setPopupGrupoAbierto] = useState(false);
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -76,12 +78,7 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
           
           {/* Botón para crear grupo */}
           <button
-            onClick={() => {
-              const name = prompt('Nombre del grupo');
-              if (!name) return;
-              // ejemplo simple: todos los contactos como participantes
-              crearGrupo(name, contactos);
-            }}
+            onClick={() => setPopupGrupoAbierto(true)}
             className="mt-4 p-2 text-white rounded flex justify-center hover:text-gray-200"
             title="Crear grupo"
           >
@@ -127,7 +124,7 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
                 {item.type === 'group' ? (
                   <div>👥 {item.name}</div>
                 ) : (
-                  <div>{item.name}#{item.tag}</div>
+                  <div>{item.name}</div>
                 )}
               </button>
 
@@ -160,6 +157,17 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
           onAceptar={aceptarSolicitud}
           onRechazar={rechazarSolicitud}
           onCerrar={() => setPopUpSolicitudesAbierto(false)}
+        />
+      )}
+      {/*NUEVO: PopUp para crear grupo */}
+      {popupGrupoAbierto && (
+        <CreateGroupPopup
+          contactos={contactos}
+          onCrear={(name, participantes) => {
+            crearGrupo(name, participantes);
+            setPopupGrupoAbierto(false);
+          }}
+          onCerrar={() => setPopupGrupoAbierto(false)}
         />
       )}
     </section>
