@@ -1,7 +1,8 @@
 import axios from 'axios';
 // La URL del API ahora se inyecta en tiempo de ejecución a través de Docker.
 // Vite reemplazará `import.meta.env.VITE_API_URL` con un placeholder durante la construcción.
-const API_URL = import.meta.env.VITE_API_URL;
+// Usamos un fallback a tu IP para que el entorno de desarrollo local (npm run dev) no se rompa.
+const API_URL = import.meta.env.VITE_API_URL || 'http://34.226.227.26:3000';
 // ── fetch nativo (usado por Login/Register) ──────────────────────────────────
 export async function apiFetch(method: string, endpoint: string, body?: any) {
   const url = `${API_URL}${endpoint}`;

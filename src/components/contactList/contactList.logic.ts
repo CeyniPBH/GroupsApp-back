@@ -210,10 +210,10 @@ useEffect(() => {
       setSolicitudesPendientes(prev => prev.filter(r => r.id !== contactId));
       setNotificaciones(prev => prev - 1);
       
-      // Recargar contactos
-      const res = await contactsAPI.getContacts();
-      const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
-      setContactos(contactosAceptados);
+      // Actualización optimista: en lugar de recargar, agregamos el nuevo contacto
+      // al estado local. Asumimos que la solicitud tiene la info del usuario que la envió.
+      const nuevoContacto = request.requester || request.user;
+      if (nuevoContacto) setContactos(prev => [nuevoContacto, ...prev]);
       
     } catch (error) {
       console.error('Error aceptando solicitud:', error);
