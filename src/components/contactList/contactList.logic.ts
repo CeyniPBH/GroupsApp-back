@@ -37,6 +37,24 @@ export const useContactList = (
     console.error('Error creando grupo:', error);
   }
 };
+  const abrirChatDirecto = async (contacto: User) => {
+  try {
+    const res = await chatsAPI.createChat({
+      type: 'direct',
+      participantIds: [contacto.id],
+    });
+
+    const chatId = res.data.id;
+    onSelectItem({
+      id: chatId,
+      name: contacto.name,
+      tag: contacto.tag,
+      type: 'contact'
+    });
+  } catch (error) {
+    console.error('Error abriendo chat directo:', error);
+  }
+};
   //cargar grupos
   useEffect(() => {
   const cargarChats = async () => {
@@ -230,6 +248,7 @@ useEffect(() => {
     aceptarSolicitud,
     rechazarSolicitud,
     crearGrupo,
+    abrirChatDirecto,
     chats,
   };
 };

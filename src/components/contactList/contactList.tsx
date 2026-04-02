@@ -4,6 +4,7 @@ import type { ContactListProps } from './contactList.types';
 import CreateGroupPopup from '../popUp/CreateGroupPopup'; 
 import { useContactList } from './contactList.logic';
 import AddUserIcon from '../../assets/addUser.svg';
+import GroupIcon from '../../assets/group.svg';
 import LogOutIcon from '../../assets/logOut.svg';
 import BellIcon from '../../assets/bell.svg';
 import { useState } from 'react';
@@ -23,6 +24,7 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
     aceptarSolicitud,
     rechazarSolicitud,
     crearGrupo,
+    abrirChatDirecto,
     chats,
   } = useContactList(usuarioActual, onSelectItem);
   const [popupGrupoAbierto, setPopupGrupoAbierto] = useState(false);
@@ -82,7 +84,7 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
             className="mt-4 p-2 text-white rounded flex justify-center hover:text-gray-200"
             title="Crear grupo"
           >
-            👥
+            <GroupIcon className="w-8 h-8" />
           </button>
                 
           <button
@@ -116,8 +118,16 @@ const ContactList = ({ usuarioActual, onSelectItem }: ContactListProps) => {
             <div key={item.uniqueKey} className='text-xl justify-between rounded-xl flex mb-2 mx-4 w-[13/14] bg-slate-800 hover:bg-slate-700'>
               <button
                 onClick={() => {
-                  console.log('🖱️ Click en item:', item);
-                  onSelectItem(item);
+                    console.log('🖱️ Click en item:', item);
+                    if (item.type === 'group') {
+                      onSelectItem(item);
+                    } else {
+                      // Es un contacto: obtener/crear el chat directo
+                      const contactoReal = contactos.find(c => c.id === item.id);
+                      if (contactoReal) {
+                        abrirChatDirecto(contactoReal);
+                      }
+                    }
                 }}
                 className="w-10/12 p-2 text-left text-gray-300"
               >
