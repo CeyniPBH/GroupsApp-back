@@ -37,6 +37,24 @@ export const useContactList = (
     console.error('Error creando grupo:', error);
   }
 };
+  const abrirChatDirecto = async (contacto: User) => {
+  try {
+    const res = await chatsAPI.createChat({
+      type: 'direct',
+      participantIds: [contacto.id],
+    });
+
+    const chatId = res.data.id;
+    onSelectItem({
+      id: chatId,
+      name: contacto.name,
+      tag: contacto.tag,
+      type: 'contact'
+    });
+  } catch (error) {
+    console.error('Error abriendo chat directo:', error);
+  }
+};
   //cargar grupos
   useEffect(() => {
   const cargarChats = async () => {
@@ -56,11 +74,21 @@ export const useContactList = (
     
     const cargarContactos = async () => {
       try {
-        const res = await contactsAPI.getContacts();
-        // Filtrar solo contactos aceptados (status = 'accepted')
-        const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
-        setContactos(contactosAceptados);
-      } catch (error) {
+    const res = await contactsAPI.getContacts();
+    const contactosAceptados = res.data
+      .filter((c: any) => c.status === 'accepted')
+      .map((c: any) => {
+        // El contacto es el otro usuario (no yo)
+        const otroUsuario = c.userId === usuarioActual?.id ? c.receiver : c.requester;
+        return {
+          id: otroUsuario.id,
+          name: otroUsuario.name,
+          tag: otroUsuario.tag,
+          status: c.status,
+        };
+      });
+    setContactos(contactosAceptados);
+  } catch (error) {
         console.error('Error cargando contactos:', error);
       }
     };
@@ -99,8 +127,8 @@ export const useContactList = (
     
     cargarSolicitudes();
     
-    // Recargar cada 15 segundos (como en el HTML original)
-    const interval = setInterval(cargarSolicitudes, 15000);
+    // Recargar cada 5 segundos
+    const interval = setInterval(cargarSolicitudes, 5000);
     return () => clearInterval(interval);
   }, [usuarioActual]);
 
@@ -220,6 +248,7 @@ useEffect(() => {
     aceptarSolicitud,
     rechazarSolicitud,
     crearGrupo,
+    abrirChatDirecto,
     chats,
   };
 };
